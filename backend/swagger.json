@@ -1,0 +1,994 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "summary": "Authenticate user & issue HTTP-only JWT cookie + Bearer token",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User successfully authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input payload"
+          },
+          "401": {
+            "description": "Invalid email or password"
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "summary": "Log out active user & clear session cookie",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successfully logged out"
+          }
+        },
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "AuthController_getProfile",
+        "summary": "Get profile details of the currently authenticated user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Current user profile information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "jwt": []
+          },
+          {
+            "jwt": []
+          }
+        ]
+      }
+    },
+    "/api/schools": {
+      "get": {
+        "operationId": "SchoolsController_findAll",
+        "summary": "Get list of all partner schools for dropdown pickers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Alphabetically sorted list of schools",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SchoolResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Lookups"
+        ],
+        "security": [
+          {
+            "jwt": []
+          },
+          {
+            "jwt": []
+          }
+        ]
+      }
+    },
+    "/api/programs": {
+      "get": {
+        "operationId": "ProgramsController_findAll",
+        "summary": "Get list of programs (optionally filtered by schoolId) for dropdown pickers",
+        "parameters": [
+          {
+            "name": "schoolId",
+            "required": false,
+            "in": "query",
+            "description": "Filter programs by School ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Alphabetically sorted list of programs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProgramResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Lookups"
+        ],
+        "security": [
+          {
+            "jwt": []
+          },
+          {
+            "jwt": []
+          }
+        ]
+      }
+    },
+    "/api/agents": {
+      "get": {
+        "operationId": "AgentsController_findAll",
+        "summary": "Get list of partner agencies for filter pickers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Alphabetically sorted list of agents",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AgentResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Lookups"
+        ],
+        "security": [
+          {
+            "jwt": []
+          },
+          {
+            "jwt": []
+          }
+        ]
+      }
+    },
+    "/api/applications": {
+      "get": {
+        "operationId": "ApplicationsController_findAll",
+        "summary": "List and filter applications with tenant-isolated scoping (RBAC)",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-indexed)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "stage",
+            "required": false,
+            "in": "query",
+            "description": "Filter applications by stage",
+            "schema": {
+              "enum": [
+                "Lead",
+                "Shortlisted",
+                "Applied",
+                "Offer Received",
+                "Accepted",
+                "Visa Applied",
+                "Visa Issued",
+                "Enrolled",
+                "Withdrawn"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "schoolId",
+            "required": false,
+            "in": "query",
+            "description": "Filter applications by School ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "programId",
+            "required": false,
+            "in": "query",
+            "description": "Filter applications by Program ID (UUID)",
+            "schema": {
+              "example": "660e8400-e29b-41d4-a716-446655440001",
+              "type": "string"
+            }
+          },
+          {
+            "name": "agentId",
+            "required": false,
+            "in": "query",
+            "description": "Filter applications by Agent ID (UUID) - Admin only",
+            "schema": {
+              "example": "a1111111-1111-1111-1111-111111111111",
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search string matching student name (case-insensitive)",
+            "schema": {
+              "example": "Aarav",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of applications matching search and filter criteria",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedApplicationsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Applications"
+        ],
+        "security": [
+          {
+            "jwt": []
+          },
+          {
+            "jwt": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "ApplicationsController_create",
+        "summary": "Create new student application (Auto-assigns agent for AGENT role)",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApplicationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Application successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          }
+        },
+        "tags": [
+          "Applications"
+        ],
+        "security": [
+          {
+            "jwt": []
+          },
+          {
+            "jwt": []
+          }
+        ]
+      }
+    },
+    "/api/applications/{id}": {
+      "get": {
+        "operationId": "ApplicationsController_findOne",
+        "summary": "Get single application details with relations (RBAC scoped)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Application UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application details with program and agent info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: application belongs to another agent"
+          },
+          "404": {
+            "description": "Application not found"
+          }
+        },
+        "tags": [
+          "Applications"
+        ],
+        "security": [
+          {
+            "jwt": []
+          },
+          {
+            "jwt": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "ApplicationsController_update",
+        "summary": "Update application details / stage (Auto-tracks stageEnteredDate)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Application UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateApplicationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Application updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Application not found"
+          }
+        },
+        "tags": [
+          "Applications"
+        ],
+        "security": [
+          {
+            "jwt": []
+          },
+          {
+            "jwt": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ApplicationsController_remove",
+        "summary": "Delete application record (Admin only)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Application UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application deleted successfully"
+          },
+          "403": {
+            "description": "Forbidden: Admin access required"
+          },
+          "404": {
+            "description": "Application not found"
+          }
+        },
+        "tags": [
+          "Applications"
+        ],
+        "security": [
+          {
+            "jwt": []
+          },
+          {
+            "jwt": []
+          }
+        ]
+      }
+    },
+    "/api/applications/{id}/notes": {
+      "patch": {
+        "operationId": "ApplicationsController_updateNotes",
+        "summary": "Update application notes (Live auto-save support)",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Application UUID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNotesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notes updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Application not found"
+          }
+        },
+        "tags": [
+          "Applications"
+        ],
+        "security": [
+          {
+            "jwt": []
+          },
+          {
+            "jwt": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "International Student Application Tracker API",
+    "description": "REST API and Grounded AI Diagnostic Agent for International Student Admissions & Partner Management",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "jwt",
+        "description": "HTTP-only Session JWT Cookie"
+      },
+      "jwt": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "description": "Bearer JWT token authorization"
+      }
+    },
+    "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User email address",
+            "example": "admin@tracker.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "User password",
+            "example": "password123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User unique ID (UUID)",
+            "example": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+          },
+          "email": {
+            "type": "string",
+            "description": "User email address",
+            "example": "admin@tracker.com"
+          },
+          "role": {
+            "type": "string",
+            "description": "User authorization role",
+            "enum": [
+              "ADMIN",
+              "AGENT"
+            ],
+            "example": "ADMIN"
+          },
+          "agentId": {
+            "type": "string",
+            "description": "Associated Agent ID (UUID) if role is AGENT",
+            "example": "a1111111-1111-1111-1111-111111111111"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "role"
+        ]
+      },
+      "LoginResponseDto": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "description": "Authenticated user profile",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UserResponseDto"
+              }
+            ]
+          },
+          "accessToken": {
+            "type": "string",
+            "description": "JWT Access Token for Bearer header auth",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        },
+        "required": [
+          "user",
+          "accessToken"
+        ]
+      },
+      "SchoolResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "School UUID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "name": {
+            "type": "string",
+            "description": "School Name",
+            "example": "University of Toronto"
+          },
+          "country": {
+            "type": "string",
+            "description": "School Country",
+            "example": "Canada"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "country"
+        ]
+      },
+      "ProgramResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Program UUID",
+            "example": "660e8400-e29b-41d4-a716-446655440001"
+          },
+          "schoolId": {
+            "type": "string",
+            "description": "School UUID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "name": {
+            "type": "string",
+            "description": "Program Name",
+            "example": "MSc Computer Science"
+          },
+          "tuitionUsd": {
+            "type": "number",
+            "description": "Annual Tuition in USD",
+            "example": 28000
+          },
+          "school": {
+            "description": "Parent School details",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SchoolResponseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "schoolId",
+          "name",
+          "tuitionUsd"
+        ]
+      },
+      "AgentResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Agent UUID",
+            "example": "a1111111-1111-1111-1111-111111111111"
+          },
+          "name": {
+            "type": "string",
+            "description": "Agency Name",
+            "example": "Global Education Pathways"
+          },
+          "country": {
+            "type": "string",
+            "description": "Agent Country",
+            "example": "India"
+          },
+          "tier": {
+            "type": "string",
+            "description": "Agent Performance Tier",
+            "enum": [
+              "Bronze",
+              "Silver",
+              "Gold"
+            ],
+            "example": "Gold"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "country",
+          "tier"
+        ]
+      },
+      "ApplicationResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Application unique ID (UUID)",
+            "example": "770e8400-e29b-41d4-a716-446655440002"
+          },
+          "studentName": {
+            "type": "string",
+            "description": "Student Name",
+            "example": "Aarav Sharma"
+          },
+          "agentId": {
+            "type": "string",
+            "description": "Agent ID (UUID)",
+            "example": "a1111111-1111-1111-1111-111111111111"
+          },
+          "programId": {
+            "type": "string",
+            "description": "Program ID (UUID)",
+            "example": "660e8400-e29b-41d4-a716-446655440001"
+          },
+          "stage": {
+            "type": "string",
+            "description": "Application Stage",
+            "enum": [
+              "Lead",
+              "Shortlisted",
+              "Applied",
+              "Offer Received",
+              "Accepted",
+              "Visa Applied",
+              "Visa Issued",
+              "Enrolled",
+              "Withdrawn"
+            ],
+            "example": "Applied"
+          },
+          "stageEnteredDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Date current stage was entered",
+            "example": "2026-03-15T08:30:00.000Z"
+          },
+          "createdDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Application creation date",
+            "example": "2026-01-10T10:00:00.000Z"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Counselor or internal notes",
+            "example": "Documents submitted for review."
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Record creation timestamp",
+            "example": "2026-01-10T10:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Record last updated timestamp",
+            "example": "2026-03-15T08:30:00.000Z"
+          },
+          "agent": {
+            "description": "Associated Partner Agent details",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AgentResponseDto"
+              }
+            ]
+          },
+          "program": {
+            "description": "Associated Program details",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProgramResponseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "studentName",
+          "agentId",
+          "programId",
+          "stage",
+          "stageEnteredDate",
+          "createdDate",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "PaginatedResponseMetaDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number",
+            "description": "Total number of items matching filters",
+            "example": 226
+          },
+          "page": {
+            "type": "number",
+            "description": "Current page number",
+            "example": 1
+          },
+          "limit": {
+            "type": "number",
+            "description": "Items per page limit",
+            "example": 50
+          },
+          "totalPages": {
+            "type": "number",
+            "description": "Total number of pages",
+            "example": 5
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "limit",
+          "totalPages"
+        ]
+      },
+      "PaginatedApplicationsResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "List of applications for current page",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplicationResponseDto"
+            }
+          },
+          "meta": {
+            "description": "Pagination metadata",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaginatedResponseMetaDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "meta"
+        ]
+      },
+      "CreateApplicationDto": {
+        "type": "object",
+        "properties": {
+          "studentName": {
+            "type": "string",
+            "description": "Student Full Name",
+            "example": "Arun Sharma",
+            "minLength": 2,
+            "maxLength": 255
+          },
+          "programId": {
+            "type": "string",
+            "description": "Program ID (UUID)",
+            "example": "660e8400-e29b-41d4-a716-446655440001"
+          },
+          "agentId": {
+            "type": "string",
+            "description": "Agent ID (UUID) - automatically populated for AGENT role users",
+            "example": "a1111111-1111-1111-1111-111111111111"
+          },
+          "stage": {
+            "type": "string",
+            "description": "Initial application pipeline stage",
+            "enum": [
+              "Lead",
+              "Shortlisted",
+              "Applied",
+              "Offer Received",
+              "Accepted",
+              "Visa Applied",
+              "Visa Issued",
+              "Enrolled",
+              "Withdrawn"
+            ],
+            "default": "Lead",
+            "example": "Lead"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional counselor or admissions notes",
+            "example": "Student has IELTS 7.5 and completed undergraduate degree in IT.",
+            "maxLength": 5000
+          }
+        },
+        "required": [
+          "studentName",
+          "programId"
+        ]
+      },
+      "UpdateApplicationDto": {
+        "type": "object",
+        "properties": {
+          "studentName": {
+            "type": "string",
+            "description": "Updated Student Full Name",
+            "example": "Arun Kumar Sharma",
+            "minLength": 2,
+            "maxLength": 255
+          },
+          "stage": {
+            "type": "string",
+            "description": "Updated pipeline stage",
+            "enum": [
+              "Lead",
+              "Shortlisted",
+              "Applied",
+              "Offer Received",
+              "Accepted",
+              "Visa Applied",
+              "Visa Issued",
+              "Enrolled",
+              "Withdrawn"
+            ],
+            "example": "Offer Received"
+          }
+        }
+      },
+      "UpdateNotesDto": {
+        "type": "object",
+        "properties": {
+          "notes": {
+            "type": "string",
+            "description": "Updated application notes",
+            "example": "Visa appointment booked for October 15th.",
+            "maxLength": 5000
+          }
+        }
+      }
+    }
+  }
+}

@@ -14,9 +14,10 @@ import { AiDiagnosticResponseDto, AiToolName } from './dto/ai-diagnostic-respons
 import { Role } from '../../types/enums';
 import { AiSqlAggregations } from './tools/sql-aggregations';
 import {
-  ALL_TOOL_DECLARATIONS,
+  getToolDeclarationsForRole,
   AI_SYSTEM_PROMPT,
   ToolArgumentSanitizer,
+  UNSUPPORTED_QUERY_SENTINEL,
 } from './tools/tool-registry';
 
 export interface AuthenticatedUserContext {
@@ -95,12 +96,13 @@ export class AiService {
     }
 
     try {
-      // 3. Initialize Google Gemini Flash model & Chat Session
+      // 3. Initialize Google Gemini Flash model with role-scoped tools
       const modelName = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+      const roleTools = getToolDeclarationsForRole(user.role);
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
         model: modelName,
-        tools: [{ functionDeclarations: ALL_TOOL_DECLARATIONS }],
+        tools: [{ functionDeclarations: roleTools }],
         systemInstruction: AI_SYSTEM_PROMPT,
       });
 
@@ -110,9 +112,20 @@ export class AiService {
       });
 
       const functionCalls = turn1Result.response.functionCalls();
+      let responseText = '';
+      try {
+        responseText = turn1Result.response.text().trim();
+      } catch {
+        // Function calls may not contain text
+      }
 
-      // 5. If no tool is selected (unsupported / off-domain question), return 400 Bad Request
-      if (!functionCalls || functionCalls.length === 0) {
+      // 5. If no tool is selected or sentinel is returned (unsupported / off-domain question), return 400 Bad Request
+      if (
+        !functionCalls ||
+        functionCalls.length === 0 ||
+        responseText === UNSUPPORTED_QUERY_SENTINEL ||
+        responseText.includes(UNSUPPORTED_QUERY_SENTINEL)
+      ) {
         if (langfuseTrace) {
           try {
             langfuseTrace.update({

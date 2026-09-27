@@ -128,6 +128,18 @@ export class ApplicationsController {
     return this.applicationsService.updateNotes(id, updateNotesDto, user);
   }
 
+  @Post(':id/notes')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update application notes via POST alias' })
+  @ApiParam({ name: 'id', description: 'Application UUID', format: 'uuid' })
+  async postNotes(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() updateNotesDto: UpdateNotesDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<ApplicationResponseDto> {
+    return this.applicationsService.updateNotes(id, updateNotesDto, user);
+  }
+
   @Delete(':id')
   @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Delete application record (Admin only)' })

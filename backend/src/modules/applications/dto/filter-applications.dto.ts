@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
-import { ApplicationStage } from '../../../types/enums';
+import { IsEnum, IsIn, IsISO8601, IsOptional, IsString, IsUUID } from 'class-validator';
+import { ApplicationStage, AgentTier } from '../../../types/enums';
 import { PaginationQueryDto } from '../../../common/dto/pagination-query.dto';
 
 export class FilterApplicationsDto extends PaginationQueryDto {
@@ -39,10 +39,54 @@ export class FilterApplicationsDto extends PaginationQueryDto {
   agentId?: string;
 
   @ApiPropertyOptional({
+    description: 'Filter applications by Agent Tier',
+    enum: AgentTier,
+  })
+  @IsOptional()
+  @IsEnum(AgentTier, {
+    message: `tier must be a valid AgentTier: ${Object.values(AgentTier).join(', ')}`,
+  })
+  tier?: AgentTier;
+
+  @ApiPropertyOptional({
     description: 'Search string matching student name (case-insensitive)',
     example: 'Aarav',
   })
   @IsOptional()
   @IsString()
   search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter applications created on or after this ISO date',
+    example: '2026-01-01',
+  })
+  @IsOptional()
+  @IsISO8601()
+  startDate?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter applications created on or before this ISO date',
+    example: '2026-12-31',
+  })
+  @IsOptional()
+  @IsISO8601()
+  endDate?: string;
+
+  @ApiPropertyOptional({
+    description: 'Column to sort by',
+    enum: ['createdDate', 'stageEnteredDate', 'studentName', 'createdAt'],
+    default: 'createdDate',
+  })
+  @IsOptional()
+  @IsIn(['createdDate', 'stageEnteredDate', 'studentName', 'createdAt'])
+  sortBy?: string = 'createdDate';
+
+  @ApiPropertyOptional({
+    description: 'Sort direction',
+    enum: ['ASC', 'DESC'],
+    default: 'DESC',
+  })
+  @IsOptional()
+  @IsIn(['ASC', 'DESC', 'asc', 'desc'])
+  sortOrder?: 'ASC' | 'DESC' = 'DESC';
 }

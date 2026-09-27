@@ -119,13 +119,27 @@ export class ApplicationsService {
       qb.andWhere('app.agentId = :agentId', { agentId: filterDto.agentId });
     }
 
+    if (filterDto.tier) {
+      qb.andWhere('agent.tier = :tier', { tier: filterDto.tier });
+    }
+
+    if (filterDto.startDate) {
+      qb.andWhere('app.createdDate >= :startDate', { startDate: filterDto.startDate });
+    }
+
+    if (filterDto.endDate) {
+      qb.andWhere('app.createdDate <= :endDate', { endDate: filterDto.endDate });
+    }
+
     if (filterDto.search && filterDto.search.trim().length > 0) {
       qb.andWhere('LOWER(app.studentName) LIKE LOWER(:search)', {
         search: `%${filterDto.search.trim()}%`,
       });
     }
 
-    qb.orderBy('app.createdDate', 'DESC').addOrderBy('app.createdAt', 'DESC');
+    const sortColumn = filterDto.sortBy ? `app.${filterDto.sortBy}` : 'app.createdDate';
+    const sortDirection = (filterDto.sortOrder || 'DESC').toUpperCase() as 'ASC' | 'DESC';
+    qb.orderBy(sortColumn, sortDirection).addOrderBy('app.createdAt', 'DESC');
     qb.skip(skip).take(limit);
 
     const [items, total] = await qb.getManyAndCount();

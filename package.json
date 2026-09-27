@@ -17,6 +17,7 @@
     "lint": "npm run lint -w backend && npm run lint -w frontend",
     "test": "npm run test -w backend",
     "test:evals": "npm run test:evals -w backend",
+    "test:evals:extended": "npm run test:evals:extended -w backend",
     "codegen": "npm run export:openapi -w backend && npm run codegen -w frontend"
   },
   "keywords": [

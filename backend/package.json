@@ -17,7 +17,8 @@
     "test": "cross-env NODE_ENV=test jest --runInBand --config jest.config.ts",
     "test:watch": "cross-env NODE_ENV=test jest --watch --config jest.config.ts",
     "test:cov": "cross-env NODE_ENV=test jest --coverage --config jest.config.ts",
-    "test:evals": "cross-env NODE_ENV=test ts-node src/evals/run-evals.ts"
+    "test:evals": "cross-env NODE_ENV=test ts-node src/evals/run-evals.ts",
+    "test:evals:extended": "cross-env NODE_ENV=test ts-node src/evals/run-extended-evals.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

@@ -1,0 +1,17 @@
+id,school_id,name,tuition_usd
+P001,S001,BSc Computer Science,24000
+P002,S001,MBA General Management,32000
+P003,S002,MSc Data Analytics,26500
+P004,S002,BEng Civil Engineering,23000
+P005,S003,Bachelor of Commerce,21000
+P006,S003,Master of Public Health,28000
+P007,S004,BSc Nursing,27000
+P008,S004,MSc Information Systems,25500
+P009,S005,Diploma in Hospitality Management,15000
+P010,S005,BSc Mechanical Engineering,22500
+P011,S006,MA International Business,29000
+P012,S006,LLM Law,31000
+P013,S007,Graduate Diploma in Accounting,18000
+P014,S007,MBA Finance,33000
+P015,S008,Associate Degree in IT,13500
+P016,S008,BSc Electrical Engineering,24500

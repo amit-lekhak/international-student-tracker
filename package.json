@@ -1,0 +1,33 @@
+{
+  "name": "international-student-application-tracker",
+  "version": "1.0.0",
+  "description": "International Student Application Tracker with Grounded AI Diagnostic Agent",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "setup": "npm install && npm run db:bootstrap -w backend",
+    "seed": "npm run seed -w backend",
+    "dev:backend": "npm run start:dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "dev": "npm run start:dev -w backend",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "lint": "npm run lint -w backend && npm run lint -w frontend",
+    "test": "npm run test -w backend",
+    "test:evals": "npm run test:evals -w backend",
+    "codegen": "npm run export:openapi -w backend && npm run codegen -w frontend"
+  },
+  "keywords": [
+    "nestjs",
+    "react",
+    "typeorm",
+    "postgresql",
+    "ai-agent",
+    "gemini",
+    "langfuse"
+  ],
+  "author": "Amit Lekhak",
+  "license": "UNLICENSED"
+}

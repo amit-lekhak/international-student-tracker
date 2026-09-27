@@ -8,6 +8,7 @@ import { SchoolsModule } from './modules/schools/schools.module';
 import { ProgramsModule } from './modules/programs/programs.module';
 import { AgentsModule } from './modules/agents/agents.module';
 import { ApplicationsModule } from './modules/applications/applications.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ApplicationsModule } from './modules/applications/applications.module';
     ProgramsModule,
     AgentsModule,
     ApplicationsModule,
+    AiModule,
   ],
   controllers: [],
   providers: [],

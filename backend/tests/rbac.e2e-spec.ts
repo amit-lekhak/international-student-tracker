@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import request from 'supertest';
 import cookieParser from 'cookie-parser';
 import { AppModule } from '../src/app.module';
@@ -34,6 +35,10 @@ describe('RBAC & Applications Scoping (E2E)', () => {
       }),
     );
     await app.init();
+
+    const dataSource = app.get<DataSource>(DataSource);
+    const { seedDatabase } = await import('../src/scripts/seed');
+    await seedDatabase(dataSource, { reset: true, silent: true });
 
     // 1. Authenticate Admin
     const adminLogin = await request(app.getHttpServer())

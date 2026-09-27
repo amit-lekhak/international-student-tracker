@@ -10,6 +10,7 @@ import { SchoolsController } from '../modules/schools/schools.controller';
 import { ProgramsController } from '../modules/programs/programs.controller';
 import { AgentsController } from '../modules/agents/agents.controller';
 import { ApplicationsController } from '../modules/applications/applications.controller';
+import { AiController } from '../modules/ai/ai.controller';
 
 // Import Services to mock providers for DI
 import { AuthService } from '../modules/auth/auth.service';
@@ -17,6 +18,7 @@ import { SchoolsService } from '../modules/schools/schools.service';
 import { ProgramsService } from '../modules/programs/programs.service';
 import { AgentsService } from '../modules/agents/agents.service';
 import { ApplicationsService } from '../modules/applications/applications.service';
+import { AiService } from '../modules/ai/ai.service';
 
 @Module({
   controllers: [
@@ -25,6 +27,7 @@ import { ApplicationsService } from '../modules/applications/applications.servic
     ProgramsController,
     AgentsController,
     ApplicationsController,
+    AiController,
   ],
   providers: [
     { provide: AuthService, useValue: {} },
@@ -32,6 +35,7 @@ import { ApplicationsService } from '../modules/applications/applications.servic
     { provide: ProgramsService, useValue: {} },
     { provide: AgentsService, useValue: {} },
     { provide: ApplicationsService, useValue: {} },
+    { provide: AiService, useValue: {} },
   ],
 })
 class SwaggerExportModule {}

@@ -1,5 +1,5 @@
-import { Controller, Get, Header, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiCookieAuth, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Header, Param, ParseUUIDPipe, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiCookieAuth, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { AgentsService } from './agents.service';
 import { AgentResponseDto } from './dto/agent-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -23,4 +23,18 @@ export class AgentsController {
   async findAll(): Promise<AgentResponseDto[]> {
     return this.agentsService.findAll();
   }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get agency details by agent ID' })
+  @ApiParam({ name: 'id', description: 'Agent UUID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Agent profile details',
+    type: AgentResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'Agent not found' })
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<AgentResponseDto> {
+    return this.agentsService.findOne(id);
+  }
 }
+

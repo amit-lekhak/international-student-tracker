@@ -1,65 +1,137 @@
-import { GraduationCap, Database, Sparkles, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from './context/ToastContext';
+import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './context/AuthContext';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { Header } from './components/layout/Header';
+import { FilterBar } from './components/applications/FilterBar';
+import { ApplicationTable } from './components/applications/ApplicationTable';
+import { ApplicationDrawer } from './components/applications/ApplicationDrawer';
+import { NewApplicationModal } from './components/applications/NewApplicationModal';
+import { AiDiagnosticPanel } from './components/ai/AiDiagnosticPanel';
+import { LoginScreen } from './components/auth/LoginScreen';
+import { useApplications } from './hooks/useApplications';
+import { ApplicationFilterParams } from './types/domain';
+
+// TanStack Query client with tiered cache config
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+const DEFAULT_FILTERS: ApplicationFilterParams = {
+  page: 1,
+  limit: 15,
+  sortBy: 'stageEnteredDate',
+  sortOrder: 'DESC',
+};
+
+function MainDashboard() {
+  const [filters, setFilters] = useState<ApplicationFilterParams>(DEFAULT_FILTERS);
+  const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
+  const [isNewModalOpen, setIsNewModalOpen] = useState(false);
+  const [isAiConsoleOpen, setIsAiConsoleOpen] = useState(false);
+
+  const { data, isLoading } = useApplications(filters);
+  const totalCount = data?.meta?.total ?? data?.total;
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
+      {/* Sticky Top Navigation */}
+      <Header onOpenNewModal={() => setIsNewModalOpen(true)} />
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col">
+        {/* Application Pipeline Workspace */}
+        <div className="max-w-7xl w-full mx-auto px-3 sm:px-6 py-3 sm:py-5 space-y-3 sm:space-y-4 flex-1">
+          {/* Filter Bar */}
+          <ErrorBoundary fallbackTitle="Filter bar failed to load">
+            <FilterBar
+              filters={filters}
+              onChange={setFilters}
+              totalCount={totalCount}
+              isLoading={isLoading}
+            />
+          </ErrorBoundary>
+
+          {/* Application Data Table */}
+          <ErrorBoundary fallbackTitle="Application table failed to load">
+            <ApplicationTable
+              data={data}
+              isLoading={isLoading}
+              filters={filters}
+              onFilterChange={setFilters}
+              onSelectApplication={setSelectedAppId}
+            />
+          </ErrorBoundary>
+        </div>
+      </main>
+
+      {/* Floating Bottom-Right Chatbot Widget */}
+      <ErrorBoundary fallbackTitle="AI Assistant crashed">
+        <AiDiagnosticPanel
+          isOpen={isAiConsoleOpen}
+          onClose={() => setIsAiConsoleOpen(false)}
+          onToggle={() => setIsAiConsoleOpen((v) => !v)}
+        />
+      </ErrorBoundary>
+
+      {/* Application Detail Slide-Over Drawer */}
+      <ErrorBoundary fallbackTitle="Application detail drawer crashed">
+        <ApplicationDrawer
+          applicationId={selectedAppId}
+          onClose={() => setSelectedAppId(null)}
+        />
+      </ErrorBoundary>
+
+      {/* New Application Modal */}
+      <ErrorBoundary fallbackTitle="New application form crashed">
+        <NewApplicationModal
+          isOpen={isNewModalOpen}
+          onClose={() => setIsNewModalOpen(false)}
+        />
+      </ErrorBoundary>
+    </div>
+  );
+}
+
+function AppShell() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Brief spinner during initial auto-login — prevents flash of login screen on cold load
+  if (isLoading && !isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+        <div className="h-8 w-8 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginScreen />;
+  }
+
+  return <MainDashboard />;
+}
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-40 px-6 py-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="bg-blue-600 text-white p-2 rounded-lg shadow-sm">
-            <GraduationCap className="h-6 w-6" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900">
-              International Student Application Tracker
-            </h1>
-            <p className="text-xs text-slate-500 font-medium">
-              Admissions Pipeline & Grounded AI Diagnostic Engine
-            </p>
-          </div>
-        </div>
-      </header>
-
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 bg-white border rounded-xl shadow-sm space-y-3">
-            <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm">
-              <Database className="h-4 w-4" />
-              <span>Relational Schema</span>
-            </div>
-            <h2 className="text-lg font-bold text-slate-800">PostgreSQL TypeORM Engine</h2>
-            <p className="text-sm text-slate-600">
-              Entities, multi-dimensional indexes, and deterministic synthetic seed generator
-              initialized.
-            </p>
-            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 pt-2">
-              <CheckCircle2 className="h-4 w-4" />
-              <span>Phase 1 Scaffolding Ready</span>
-            </div>
-          </div>
-
-          <div className="p-6 bg-white border rounded-xl shadow-sm space-y-3">
-            <div className="flex items-center gap-2 text-indigo-600 font-semibold text-sm">
-              <Sparkles className="h-4 w-4" />
-              <span>Grounded AI Agent</span>
-            </div>
-            <h2 className="text-lg font-bold text-slate-800">Deterministic SQL Tools</h2>
-            <p className="text-sm text-slate-600">
-              Deterministic SQL aggregations and Langfuse observability prepared for Phase 3.
-            </p>
-          </div>
-
-          <div className="p-6 bg-white border rounded-xl shadow-sm space-y-3">
-            <div className="flex items-center gap-2 text-emerald-600 font-semibold text-sm">
-              <GraduationCap className="h-4 w-4" />
-              <span>OpenAPI Codegen</span>
-            </div>
-            <h2 className="text-lg font-bold text-slate-800">Self-Contained Frontend</h2>
-            <p className="text-sm text-slate-600">
-              Tailwind CSS, Vite, and OpenAPI type-generation pipeline configured.
-            </p>
-          </div>
-        </div>
-      </main>
-    </div>
+    <ErrorBoundary fallbackTitle="Application failed to initialize">
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider>
+          <AuthProvider>
+            <ErrorBoundary fallbackTitle="Dashboard failed to render">
+              <AppShell />
+            </ErrorBoundary>
+          </AuthProvider>
+        </ToastProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }

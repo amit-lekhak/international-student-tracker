@@ -14,12 +14,12 @@
 
 ## 📑 Documentation Suite & Quick Links
 
-All technical and assessment documentation is organized in the [`docs/`](file:///Users/coresoftmac2022/Documents/Github/epa/docs) folder according to the **Diataxis Framework**:
+All technical and assessment documentation is organized in the [`docs/`](docs/) folder according to the **Diataxis Framework**:
 
-*   📘 **[SUBMISSION_WRITEUP.md](file:///Users/coresoftmac2022/Documents/Github/epa/docs/SUBMISSION_WRITEUP.md)**: **Formal Take-Home Assessment Write-Up** (Assumptions, Data Modeling, Grounded AI Design, Multi-Tenant Architecture Stretch Goal, and Frappe/ERPNext Evaluation).
-*   🏗️ **[ARCHITECTURE.md](file:///Users/coresoftmac2022/Documents/Github/epa/docs/ARCHITECTURE.md)**: Deep architectural specification, data flow diagrams, RBAC security boundary analysis, deterministic query execution, and database indexing.
-*   📡 **[API_REFERENCE.md](file:///Users/coresoftmac2022/Documents/Github/epa/docs/API_REFERENCE.md)**: Full REST API specification, DTO contracts, authentication mechanisms, and AI Tool Registry interface definitions.
-*   🧪 **[AI_EVALS_BENCHMARK.md](file:///Users/coresoftmac2022/Documents/Github/epa/docs/AI_EVALS_BENCHMARK.md)**: The complete 37-scenario AI evaluation benchmark and test scorecard.
+*   📘 **[SUBMISSION_WRITEUP.md](docs/SUBMISSION_WRITEUP.md)**: **Formal Take-Home Assessment Write-Up** (Assumptions, Data Modeling, Grounded AI Design, Multi-Tenant Architecture Stretch Goal, and Frappe/ERPNext Evaluation).
+*   🏗️ **[ARCHITECTURE.md](docs/ARCHITECTURE.md)**: Deep architectural specification, data flow diagrams, RBAC security boundary analysis, deterministic query execution, and database indexing.
+*   📡 **[API_REFERENCE.md](docs/API_REFERENCE.md)**: Full REST API specification, DTO contracts, authentication mechanisms, and AI Tool Registry interface definitions.
+*   🧪 **[AI_EVALS_BENCHMARK.md](docs/AI_EVALS_BENCHMARK.md)**: The complete 37-scenario AI evaluation benchmark and test scorecard.
 
 ---
 
@@ -135,7 +135,7 @@ npm run test:evals
 npm run test -w frontend
 ```
 
-> **Evaluation Benchmark Details**: The extended evaluation suite (`npm run test:evals:extended`) executes all 37 test scenarios across 6 pillars: Core Analytical Capabilities (Q1–Q10), Domain Boundary Refusals (Q11–Q20), Causal Grounding & Anti-Sycophancy (Q21–Q24), Schema Limitation Awareness (Q25–Q28), RBAC & Jailbreak Defense (Q29–Q36), and Semantic Paraphrasing (Q37). See [`docs/AI_EVALS_BENCHMARK.md`](file:///Users/coresoftmac2022/Documents/Github/epa/docs/AI_EVALS_BENCHMARK.md) for full scorecard.
+> **Evaluation Benchmark Details**: The extended evaluation suite (`npm run test:evals:extended`) executes all 37 test scenarios across 6 pillars: Core Analytical Capabilities (Q1–Q10), Domain Boundary Refusals (Q11–Q20), Causal Grounding & Anti-Sycophancy (Q21–Q24), Schema Limitation Awareness (Q25–Q28), RBAC & Jailbreak Defense (Q29–Q36), and Semantic Paraphrasing (Q37). See [`docs/AI_EVALS_BENCHMARK.md`](docs/AI_EVALS_BENCHMARK.md) for full scorecard.
 
 ---
 

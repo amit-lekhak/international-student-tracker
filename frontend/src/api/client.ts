@@ -24,7 +24,7 @@ export function registerAuthEvents(callbacks: {
 
 
 export const apiClient: AxiosInstance = axios.create({
-  baseURL: '',
+  baseURL: (import.meta.env.VITE_API_URL as string) || '',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
